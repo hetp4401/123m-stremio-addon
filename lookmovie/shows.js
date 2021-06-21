@@ -10,19 +10,23 @@ const limiter = new Bottleneck({
 });
 
 function rp(url) {
-  return limiter.schedule(() => request(url));
+  return request(url, { timeout: 10000 });
 }
 
 function getShows() {
   var count = 0;
+
   return getTotalPages()
-    .then((total) => [...Array(100).keys()])
+    .then((total) => [...Array(10).keys()])
     .then((pages) =>
       pages.map((x) =>
-        getShowsOnPage(x + 1)
-          .then((page) => page.map((episode) => getEpisode(episode)))
+        limiter
+          .schedule(() => getShowsOnPage(x + 1))
+          .then((page) =>
+            page.map((episode) => limiter.schedule(() => getEpisode(episode)))
+          )
           .then((episodes) => Promise.all(episodes))
-          .then((episodes) => episodes.filter((x) => x.id))
+          .then((episodes) => episodes.filter((x) => x.sources))
           .then((episodes) => {
             count += 1;
             console.log(`${count}/${pages.length} pages are done`);
@@ -81,12 +85,18 @@ function getEpisode(ep, retry = 3) {
   const { href, title, season, episode } = ep;
   const id = getId(href);
   return getLinks(id)
-    .then((links) =>
-      getImdb(title).then((imdb) => ({
+    .then(
+      (links) => ({
         title: title,
-        id: `${imdb.id}:${season}:${episode}`,
+        season: season,
+        episode: episode,
         sources: links,
-      }))
+      })
+      // getImdb(title).then((imdb) => ({
+      //   title: title,
+      //   id: `${imdb.id}:${season}:${episode}`,
+      //   sources: links,
+      // }))
     )
     .catch((err) => ({}));
 }

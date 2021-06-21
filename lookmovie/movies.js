@@ -1,17 +1,21 @@
-const rp = require("request-promise");
+const request = require("request-promise");
 const fs = require("fs");
 const parse = require("fast-html-parser").parse;
 const Bottleneck = require("bottleneck");
 const getImdb = require("../imdb");
 
 const limiter = new Bottleneck({
-  maxConcurrent: 100,
+  maxConcurrent: 200,
 });
+
+function rp(url) {
+  return request(url, { timeout: 10000 });
+}
 
 function getMovies() {
   var count = 0;
   return getTotalPages()
-    .then((total) => [...Array(10).keys()])
+    .then((total) => [...Array(total).keys()])
     .then((pages) =>
       pages.map((x) =>
         limiter
@@ -20,7 +24,7 @@ function getMovies() {
             page.map((movie) => limiter.schedule(() => getMovie(movie)))
           )
           .then((movies) => Promise.all(movies))
-          .then((movies) => movies.filter((x) => x.id))
+          .then((movies) => movies.filter((x) => x.sources))
           .then((movies) => {
             count += 1;
             console.log(`${count}/${pages.length} pages are done`);
@@ -64,12 +68,16 @@ function getMovie(movie) {
   const { href, title } = movie;
   return getId(href)
     .then((id) => getLinks(id))
-    .then((links) =>
-      getImdb(title).then((imdb) => ({
+    .then(
+      (links) => ({
         title: title,
-        id: imdb.id,
         sources: links,
-      }))
+      })
+      // getImdb(title).then((imdb) => ({
+      //   title: title,
+      //   id: imdb.id,
+      //   sources: links,
+      // }))
     )
     .catch((err) => ({}));
 }

@@ -88,12 +88,8 @@ function getLinks(id) {
     `https://lookmovie.io/manifests/movies/json/${id}/0/null/master.m3u8`
   ).then((body) => {
     const json = JSON.parse(body);
-    const base = json["480p"];
-    const links = [
-      base.replace("480p", "1080p"),
-      base.replace("480p", "720p"),
-      base,
-    ];
+    delete json.auto;
+    const links = Object.values(json);
     return links;
   });
 }

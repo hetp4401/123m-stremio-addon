@@ -11,7 +11,7 @@ const limiter = new Bottleneck({
 function getShows() {
   var count = 0;
   return getTotalPages()
-    .then((total) => [...Array(total).keys()])
+    .then((total) => [...Array(1).keys()])
     .then((pages) =>
       pages.map((x) =>
         limiter
@@ -102,12 +102,8 @@ function getLinks(id) {
     `https://lookmovie.io/manifests/shows/json/null/0/${id}/master.m3u8`
   ).then((body) => {
     const json = JSON.parse(body);
-    const base = json["480"];
-    const links = [
-      base.replace("480p", "1080p"),
-      base.replace("480p", "720p"),
-      base,
-    ];
+    delete json.auto;
+    const links = Object.values(json);
     return links;
   });
 }

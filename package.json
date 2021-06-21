@@ -16,6 +16,7 @@
     "fast-html-parser": "^1.0.1",
     "name-to-imdb": "^3.0.2",
     "request": "^2.88.2",
-    "request-promise": "^4.2.6"
+    "request-promise": "^4.2.6",
+    "user-agents": "^1.0.690"
   }
 }

@@ -1,24 +1,26 @@
-const rp = require("request-promise");
+const request = require("request-promise");
 const fs = require("fs");
 const parse = require("fast-html-parser").parse;
 const Bottleneck = require("bottleneck");
 const getImdb = require("../imdb");
+const { resolve } = require("path");
 
 const limiter = new Bottleneck({
   maxConcurrent: 200,
 });
 
+function rp(url) {
+  return limiter.schedule(() => request(url));
+}
+
 function getShows() {
   var count = 0;
   return getTotalPages()
-    .then((total) => [...Array(1).keys()])
+    .then((total) => [...Array(100).keys()])
     .then((pages) =>
       pages.map((x) =>
-        limiter
-          .schedule(() => getShowsOnPage(x + 1))
-          .then((page) =>
-            page.map((episode) => limiter.schedule(() => getEpisode(episode)))
-          )
+        getShowsOnPage(x + 1)
+          .then((page) => page.map((episode) => getEpisode(episode)))
           .then((episodes) => Promise.all(episodes))
           .then((episodes) => episodes.filter((x) => x.id))
           .then((episodes) => {
@@ -66,6 +68,7 @@ function getShowsOnPage(n) {
             title: title,
             season: season,
             episode: episode,
+            page: n,
           };
         });
 
@@ -74,10 +77,10 @@ function getShowsOnPage(n) {
     .catch((err) => []);
 }
 
-function getEpisode(ep) {
+function getEpisode(ep, retry = 3) {
   const { href, title, season, episode } = ep;
-  return getId(href)
-    .then((id) => getLinks(id))
+  const id = getId(href);
+  return getLinks(id)
     .then((links) =>
       getImdb(title).then((imdb) => ({
         title: title,
@@ -89,12 +92,9 @@ function getEpisode(ep) {
 }
 
 function getId(url) {
-  return rp(url).then((body) => {
-    const idx = body.indexOf("id_episode: ") + 12;
-    const idx2 = body.indexOf(",", idx);
-    const id = body.substring(idx, idx2);
-    return id;
-  });
+  const idx = url.lastIndexOf("-") + 1;
+  const id = url.substring(idx);
+  return id;
 }
 
 function getLinks(id) {

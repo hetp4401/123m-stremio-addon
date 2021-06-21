@@ -11,7 +11,7 @@ const limiter = new Bottleneck({
 function getMovies() {
   var count = 0;
   return getTotalPages()
-    .then((total) => [...Array(total).keys()])
+    .then((total) => [...Array(10).keys()])
     .then((pages) =>
       pages.map((x) =>
         limiter

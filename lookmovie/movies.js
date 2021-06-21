@@ -15,7 +15,7 @@ function getMovies() {
     .then((pages) =>
       pages.map((x) =>
         limiter
-          .schedule(() => getMoviesOnPage(x))
+          .schedule(() => getMoviesOnPage(x + 1))
           .then((page) =>
             page.map((movie) => limiter.schedule(() => getMovie(movie)))
           )

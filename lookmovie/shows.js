@@ -15,7 +15,7 @@ function getShows() {
     .then((pages) =>
       pages.map((x) =>
         limiter
-          .schedule(() => getShowsOnPage(x))
+          .schedule(() => getShowsOnPage(x + 1))
           .then((page) =>
             page.map((episode) => limiter.schedule(() => getEpisode(episode)))
           )

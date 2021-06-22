@@ -2,7 +2,7 @@ const request = require("request-promise");
 const fs = require("fs");
 const parse = require("fast-html-parser").parse;
 const Bottleneck = require("bottleneck");
-const getImdb = require("../imdb");
+const getImdb = require("../../../imdb");
 
 const limiter = new Bottleneck({
   maxConcurrent: 200,

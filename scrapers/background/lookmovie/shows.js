@@ -2,8 +2,7 @@ const request = require("request-promise");
 const fs = require("fs");
 const parse = require("fast-html-parser").parse;
 const Bottleneck = require("bottleneck");
-const getImdb = require("../../../imdb");
-const { resolve } = require("path");
+const getImdb = require("../../imdb");
 
 const limiter = new Bottleneck({
   maxConcurrent: 100,
@@ -59,10 +58,11 @@ function getShowsOnPage(n) {
           const href = x.querySelector("a").rawAttributes.href;
           const title = x.querySelector("h6").rawText.trim();
           const elem = x.querySelector("h5").rawText.trim();
-          const idx = elem.indexOf("Season ") + 7;
-          const season = parseInt(elem.substring(idx, idx + 1));
-          const idx2 = elem.indexOf("Episode ") + 8;
-          const episode = parseInt(elem.substring(idx2, idx2 + 1));
+          const sidx = elem.indexOf("Season ") + 7;
+          const sidx2 = elem.indexOf(",", sidx);
+          const season = parseInt(elem.substring(sidx, sidx2));
+          const eidx = elem.indexOf("Episode ") + 8;
+          const episode = parseInt(elem.substring(eidx));
 
           return {
             href: "https://lookmovie.io" + href,

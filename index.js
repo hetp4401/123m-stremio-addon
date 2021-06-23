@@ -7,7 +7,7 @@ app.use(express.static("static", { maxAge: "1y" }));
 app.use((req, res, next) => server(req, res, next));
 app.listen(process.env.PORT || 7000, () => {
   console.log(
-    `Addon manifest at: http://localhost:${
+    `addon manifest at: http://localhost:${
       process.env.PORT || 7000
     }/manifest.json`
   );

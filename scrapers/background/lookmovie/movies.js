@@ -2,7 +2,9 @@ const request = require("request-promise");
 const fs = require("fs");
 const parse = require("fast-html-parser").parse;
 const Bottleneck = require("bottleneck");
-const getImdb = require("../../../lib/imdb");
+const { getImdb } = require("../../../lib/imdb");
+
+const PAGES = 3;
 
 const limiter = new Bottleneck({
   maxConcurrent: 200,
@@ -14,8 +16,7 @@ function rp(url) {
 
 function getMovies() {
   var count = 0;
-  return getTotalPages()
-    .then((total) => [...Array(total).keys()])
+  return Promise.resolve([...Array(PAGES).keys()])
     .then((pages) =>
       pages.map((x) =>
         limiter
@@ -24,7 +25,7 @@ function getMovies() {
             page.map((movie) => limiter.schedule(() => getMovie(movie)))
           )
           .then((movies) => Promise.all(movies))
-          .then((movies) => movies.filter((x) => x.sources))
+          .then((movies) => movies.filter((x) => x.key && x.value))
           .then((movies) => {
             count += 1;
             console.log(`${count}/${pages.length} pages are done`);
@@ -34,18 +35,6 @@ function getMovies() {
     )
     .then((pages) => Promise.all(pages))
     .then((pages) => pages.reduce((a, b) => a.concat(b)));
-}
-
-function getTotalPages() {
-  return rp("https://lookmovie.io/movies")
-    .then((body) => {
-      const html = parse(body);
-      const text = html.querySelector(".pagination__right").rawText.trim();
-      const idx = text.lastIndexOf(" ") + 1;
-      const pages = parseInt(text.substring(idx));
-      return pages;
-    })
-    .catch((err) => 0);
 }
 
 function getMoviesOnPage(n) {
@@ -66,18 +55,16 @@ function getMoviesOnPage(n) {
 
 function getMovie(movie) {
   const { href, title } = movie;
-  return getId(href)
-    .then((id) => getLinks(id))
-    .then(
-      (links) => ({
-        title: title,
-        sources: links,
-      })
-      // getImdb(title).then((imdb) => ({
-      //   title: title,
-      //   id: imdb.id,
-      //   sources: links,
-      // }))
+  return getImdb(title)
+    .then((imdb) =>
+      getId(href)
+        .then((id) => getLinks(id))
+        .then((links) => links.map((x) => ({ url: x, quality: getRank(x) })))
+        .then((links) => ({
+          title: title,
+          key: imdb.id,
+          value: links,
+        }))
     )
     .catch((err) => ({}));
 }
@@ -102,9 +89,11 @@ function getLinks(id) {
   });
 }
 
-module.exports = getMovies;
+function getRank(link) {
+  if (link.includes("1080p")) return 1;
+  if (link.includes("720p")) return 2;
+  if (link.includes("480p")) return 3;
+  if (link.includes("360p")) return 4;
+}
 
-getMovies().then((movies) => {
-  console.log(movies.length);
-  fs.writeFileSync("movies.json", JSON.stringify(movies));
-});
+module.exports = { getMovies };

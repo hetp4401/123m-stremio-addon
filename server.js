@@ -1,6 +1,7 @@
 const Router = require("router");
 const qs = require("querystring");
 const rateLimit = require("express-rate-limit");
+const cors = require("cors");
 
 const addon = require("./addon");
 
@@ -13,6 +14,7 @@ const limiter = rateLimit({
 });
 
 router.use(limiter);
+router.use(cors());
 
 router.get("/manifest.json", (req, res) => {
   res.setHeader("Content-Type", "application/json; charset=utf-8");

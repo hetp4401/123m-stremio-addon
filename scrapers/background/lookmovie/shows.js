@@ -2,7 +2,9 @@ const request = require("request-promise");
 const fs = require("fs");
 const parse = require("fast-html-parser").parse;
 const Bottleneck = require("bottleneck");
-const getImdb = require("../../imdb");
+const { getImdb } = require("../../../lib/imdb");
+
+const PAGES = 3;
 
 const limiter = new Bottleneck({
   maxConcurrent: 100,
@@ -14,15 +16,13 @@ function rp(url) {
 
 function getShows() {
   var count = 0;
-
-  return getTotalPages()
-    .then((total) => [...Array(total).keys()])
+  return Promise.resolve([...Array(PAGES).keys()])
     .then((pages) =>
       pages.map((x) =>
         getShowsOnPage(x + 1)
           .then((page) => page.map((episode) => getEpisode(episode)))
           .then((episodes) => Promise.all(episodes))
-          .then((episodes) => episodes.filter((x) => x.sources))
+          .then((episodes) => episodes.filter((x) => x.key && x.value))
           .then((episodes) => {
             count += 1;
             console.log(`${count}/${pages.length} pages are done`);
@@ -32,18 +32,6 @@ function getShows() {
     )
     .then((pages) => Promise.all(pages))
     .then((pages) => pages.reduce((a, b) => a.concat(b)));
-}
-
-function getTotalPages() {
-  return rp("https://lookmovie.io/shows")
-    .then((body) => {
-      const html = parse(body);
-      const text = html.querySelector(".pagination__right").rawText.trim();
-      const idx = text.lastIndexOf(" ") + 1;
-      const pages = parseInt(text.substring(idx));
-      return pages;
-    })
-    .catch((err) => 0);
 }
 
 function getShowsOnPage(n) {
@@ -81,19 +69,15 @@ function getShowsOnPage(n) {
 function getEpisode(ep) {
   const { href, title, season, episode } = ep;
   const id = getId(href);
-  return getLinks(id)
-    .then(
-      (links) => ({
-        title: title,
-        season: season,
-        episode: episode,
-        sources: links,
-      })
-      // getImdb(title).then((imdb) => ({
-      //   title: title,
-      //   id: `${imdb.id}:${season}:${episode}`,
-      //   sources: links,
-      // }))
+  return getImdb(title)
+    .then((imdb) =>
+      getLinks(id)
+        .then((links) => links.map((x) => ({ url: x, quality: getRank(x) })))
+        .then((links) => ({
+          title: title,
+          key: `${imdb.id}:${season}:${episode}`,
+          value: links,
+        }))
     )
     .catch((err) => ({}));
 }
@@ -115,9 +99,11 @@ function getLinks(id) {
   });
 }
 
-module.exports = getShows;
+function getRank(link) {
+  if (link.includes("1080p")) return 1;
+  if (link.includes("720p")) return 2;
+  if (link.includes("480p")) return 3;
+  if (link.includes("360p")) return 4;
+}
 
-getShows().then((episodes) => {
-  console.log(episodes.length);
-  fs.writeFileSync("shows.json", JSON.stringify(episodes));
-});
+module.exports = { getShows };

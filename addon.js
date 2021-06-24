@@ -43,7 +43,7 @@ builder.defineStreamHandler(({ type, id }) => {
       staleError: STALE_ERROR_AGE,
     }))
     .catch((err) => {
-      console.log(err.substring(0, 200));
+      console.log(err.message.substring(0, 200));
       return { streams: [] };
     });
 });

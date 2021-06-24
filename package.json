@@ -17,7 +17,7 @@
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.6",
     "fast-html-parser": "^1.0.1",
-    "mongodb": "^3.2.7",
+    "mongodb": "^3.3.3",
     "name-to-imdb": "^3.0.2",
     "node-schedule": "^2.0.0",
     "qs": "^6.10.1",

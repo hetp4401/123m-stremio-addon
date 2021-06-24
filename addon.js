@@ -27,10 +27,6 @@ builder.defineStreamHandler(({ type, id }) => {
   }
 
   return Promise.all(providers.map((x) => x(id, type)))
-    .then((res) => {
-      console.log(res);
-      return res;
-    })
     .then((sources) => sources.filter((x) => x))
     .then((sources) => sources.reduce((a, b) => a.concat(b)))
     .then((streams) => streams.sort((a, b) => a.quality - b.quality))

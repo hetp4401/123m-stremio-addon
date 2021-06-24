@@ -27,6 +27,10 @@ builder.defineStreamHandler(({ type, id }) => {
   }
 
   return Promise.all(providers.map((x) => x(id, type)))
+    .then((res) => {
+      console.log(res);
+      return res;
+    })
     .then((sources) => sources.filter((x) => x))
     .then((sources) => sources.reduce((a, b) => a.concat(b)))
     .then((streams) => streams.sort((a, b) => a.quality - b.quality))
@@ -42,10 +46,7 @@ builder.defineStreamHandler(({ type, id }) => {
       staleRevalidate: STALE_REVALIDATE_AGE,
       staleError: STALE_ERROR_AGE,
     }))
-    .catch((err) => {
-      console.log(err.message.substring(0, 200));
-      return { streams: [] };
-    });
+    .catch((err) => ({ streams: [] }));
 });
 
 module.exports = builder.getInterface();

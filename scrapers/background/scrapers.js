@@ -13,9 +13,4 @@ module.exports = [
     scraper: lmShows,
     cron: "0 10 * * * *",
   },
-  {
-    name: "myDB",
-    scraper: getCollection,
-    cron: "0 5 * * * *",
-  },
 ];

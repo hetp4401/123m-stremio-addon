@@ -6,12 +6,12 @@ module.exports = [
   {
     name: "lookMovieMovies",
     scraper: lmMovies,
-    cron: "0 0 * * * *",
+    cron: "* 0 * * * *",
   },
   {
     name: "lookMovieShows",
     scraper: lmShows,
-    cron: "0 5 * * * *",
+    cron: "* 5 * * * *",
   },
   // {
   //   name: "myDB",

@@ -42,7 +42,9 @@ builder.defineStreamHandler(({ type, id }) => {
       staleRevalidate: STALE_REVALIDATE_AGE,
       staleError: STALE_ERROR_AGE,
     }))
-    .catch((err) => ({ streams: [] }));
+    .catch((err) => {
+      return { streams: [] };
+    });
 });
 
 module.exports = builder.getInterface();

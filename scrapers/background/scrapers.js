@@ -1,6 +1,5 @@
 const lmMovies = require("./lookmovie/movies").getMovies;
 const lmShows = require("./lookmovie/shows").getShows;
-//const { getCollection } = require("../../lib/db");
 
 module.exports = [
   {
@@ -13,9 +12,4 @@ module.exports = [
     scraper: lmShows,
     cron: "0 5 * * * *",
   },
-  // {
-  //   name: "myDB",
-  //   scraper: getCollection,
-  //   cron: "0 10 * * * *",
-  // },
 ];

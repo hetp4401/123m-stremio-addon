@@ -4,10 +4,10 @@ const parse = require("fast-html-parser").parse;
 const Bottleneck = require("bottleneck");
 const { getImdb } = require("../../../lib/imdb");
 
-const PAGES = 3;
+const PAGES = 10;
 
 const limiter = new Bottleneck({
-  maxConcurrent: 100,
+  maxConcurrent: 200,
 });
 
 function rp(url) {

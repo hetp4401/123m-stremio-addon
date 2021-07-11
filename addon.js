@@ -13,7 +13,7 @@ const builder = new addonBuilder({
   version: "2.0.0",
   name: "123movies",
   description:
-    "Watch movies and tv shows in HD. This addon provides direct links, an alternative to p2p streaming.",
+    "Watch movies and tv shows in HD. This addon provides direct links, an alternative to torrenting.",
   catalogs: [],
   resources: ["stream"],
   types: ["movie", "series"],

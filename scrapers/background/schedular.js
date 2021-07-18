@@ -1,6 +1,6 @@
 const schedule = require("node-schedule");
 
-const scrapers = require("./scrapers");
+const scrapers = require("./tasks");
 const { insertDocuments } = require("../../lib/db");
 
 function startScraping() {

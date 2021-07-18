@@ -4,14 +4,21 @@ const parse = require("fast-html-parser").parse;
 const Bottleneck = require("bottleneck");
 const { getImdb } = require("../../../lib/imdb");
 
+const jar = request.jar();
+
+jar.setCookie(
+  "PHPSESSID=uh2p2t8m9jpgvcpmm17u0i4u3e; have_visited_internal_page=1; _csrf=98c7c4c24448aa74e0e8a9baa652e25671b47bdd9df1f6e68ac99a308ae1872ba%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Qx2omKqFtiq1ODLN1joDU1m8Y-w560x_%22%3B%7D",
+  "https://lookmovie.io/"
+);
+
 const PAGES = 10;
 
 const limiter = new Bottleneck({
-  maxConcurrent: 200,
+  maxConcurrent: 10,
 });
 
 function rp(url) {
-  return request(url, { timeout: 10000 });
+  return request(url, { timeout: 10000, jar: jar });
 }
 
 function getMovies() {

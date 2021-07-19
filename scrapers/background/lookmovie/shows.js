@@ -18,7 +18,7 @@ const limiter = new Bottleneck({
 });
 
 function rp(url) {
-  return limiter.schedule(() => request(url, { timeout: 10000, jar: jar }));
+  return limiter.schedule(() => request(url, { timeout: 10000 }));
 }
 
 function getShows() {

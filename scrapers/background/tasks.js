@@ -5,11 +5,11 @@ module.exports = [
   {
     name: "lookMovieMovies",
     scraper: lmMovies,
-    cron: "5 */6 * * *",
+    cron: "5 */2 * * *",
   },
   {
     name: "lookMovieShows",
     scraper: lmShows,
-    cron: "20 */6 * * *",
+    cron: "20 */2 * * *",
   },
 ];

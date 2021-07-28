@@ -10,7 +10,7 @@ const QUALITY_FILTER = { 1: "1080p", 2: "720p", 3: "480p", 4: "360p" };
 
 const builder = new addonBuilder({
   id: "com.stremio.123movies.addon",
-  version: "2.0.0",
+  version: "2.0.1",
   name: "123movies",
   description:
     "Watch movies and tv shows in HD. This addon provides direct links, an alternative to torrenting.",

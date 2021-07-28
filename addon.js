@@ -36,7 +36,6 @@ builder.defineStreamHandler(({ type, id }) => {
       console.log(streams);
       streams.forEach((x) => {
         if (x.quality) x.title = QUALITY_FILTER[x.quality];
-        if (x.externalUrl) x.name = "[External] 123Movies";
       });
       return streams;
     })

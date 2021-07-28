@@ -28,11 +28,15 @@ builder.defineStreamHandler(({ type, id }) => {
 
   return Promise.all(providers.map((x) => x(id, type)))
     .then((sources) => sources.filter((x) => x))
+    .then((sources) =>
+      sources.map((x) => x.sort((a, b) => a.quality - b.quality))
+    )
     .then((sources) => sources.reduce((a, b) => a.concat(b)))
-    .then((streams) => streams.sort((a, b) => a.quality - b.quality))
     .then((streams) => {
+      console.log(streams);
       streams.forEach((x) => {
-        x.title = QUALITY_FILTER[x.quality];
+        if (x.quality) x.title = QUALITY_FILTER[x.quality];
+        if (x.externalUrl) x.name = "[External] 123Movies";
       });
       return streams;
     })
@@ -43,6 +47,7 @@ builder.defineStreamHandler(({ type, id }) => {
       staleError: STALE_ERROR_AGE,
     }))
     .catch((err) => {
+      console.log(err);
       return { streams: [] };
     });
 });

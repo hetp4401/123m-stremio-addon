@@ -3,6 +3,12 @@ const qs = require("querystring");
 const rateLimit = require("express-rate-limit");
 const cors = require("cors");
 
+const PostHog = require("posthog-node");
+const requestIp = require("request-ip");
+const client = new PostHog("phc_SBKsG426ehVxhHHb1gN57B8Gd0fJC6Zpihngs83OCGg", {
+  host: "https://app.posthog.com",
+});
+
 const addon = require("./addon");
 
 const router = new Router();
@@ -22,6 +28,11 @@ router.get("/manifest.json", (req, res) => {
 });
 
 router.get("/:resource/:type/:id/:extra?.json", (req, res, next) => {
+  client.capture({
+    distinctId: requestIp.getClientIp(req),
+    event: "user",
+  });
+
   const { resource, type, id } = req.params;
 
   const extra = req.params.extra

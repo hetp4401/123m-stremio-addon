@@ -33,7 +33,6 @@ builder.defineStreamHandler(({ type, id }) => {
     )
     .then((sources) => sources.reduce((a, b) => a.concat(b)))
     .then((streams) => {
-      console.log(streams);
       streams.forEach((x) => {
         if (x.quality) x.title = QUALITY_FILTER[x.quality];
       });

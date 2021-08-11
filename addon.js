@@ -32,6 +32,7 @@ builder.defineStreamHandler(({ type, id }) => {
       sources.map((x) => x.sort((a, b) => a.quality - b.quality))
     )
     .then((sources) => sources.reduce((a, b) => a.concat(b)))
+    .then((sources) => sources.sort((a, b) => a.quality - b.quality))
     .then((streams) => {
       streams.forEach((x) => {
         if (x.quality) x.title = QUALITY_FILTER[x.quality];

@@ -11,7 +11,7 @@ function getStream(id, type) {
 }
 
 function getSource(url) {
-  return needle("get", url, { timeout: 5000 })
+  return needle("get", url, { open_timeout: 5000 })
     .then((res) => res.headers.location)
     .then((location) => [
       {
